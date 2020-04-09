@@ -4,6 +4,10 @@ from websocket import create_connection
 import requests
 import pyttsx3
 import ssl
+import urllib3
+import os
+
+urllib3.disable_warnings()
 
 print("Thanks for Running Halligan Listener")
 
@@ -15,12 +19,22 @@ ws = create_connection("wss://www.halliganhelper.com/ws/ta?subscribe-broadcast",
 # seconds after ping fail
 retryInterval = 5
 
-# fill this in before running
-loginEmail = ''
-loginPassword = ''
+#port:443
+#halliganhelper.com:443/api/v3/school/-->homepage
+#halliganhelper.com:443/api/v3/school/16/officehours
+#halliganhelper.com:443/api/v3/school/16/requests
+#halliganhelper.com:443/ws/ta?subscribe-broadcast
 
-assert (loginEmail != ''), 'login email not set'
-assert (loginPassword != ''), 'login password not set'
+
+# fill this in before running
+loginEmail = os.getenv('HALLIGAN_U')
+loginPassword = os.getenv('HALLIGAN_PW')
+
+if loginEmail == None:
+    loginEmail  = input("Email: ")
+
+if loginPassword == None:
+    loginPassword  = input("Password: ")
 
 r = requests.post('https://www.halliganhelper.com/api/v3/user/login/',
                   data = {'email': loginEmail, 'password': loginPassword}, verify = False)
