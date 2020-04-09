@@ -2,3 +2,5 @@ credentials.py
 __pycache__
 listener_env
 start.ps1
+setup.sh
+*.swp

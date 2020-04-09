@@ -2,28 +2,36 @@ import json, sys, itertools, time
 from json import JSONDecodeError
 from websocket import create_connection
 import requests
-import pyttsx3
 import ssl
+import subprocess
+import os
+import urllib3
+
+urllib3.disable_warnings() #cleaner output
 
 print("Thanks for Running Halligan Listener")
 
-engine = pyttsx3.init()
-engine.setProperty('rate', 180)
+#engine = pyttsx3.init("espeak")
+#engine.setProperty('rate', 180)
 
 ws = create_connection("wss://www.halliganhelper.com/ws/ta?subscribe-broadcast", sslopt={"cert_reqs": ssl.CERT_NONE})
+
+print(*ws)
 
 # seconds after ping fail
 retryInterval = 5
 
 # fill this in before running
-loginEmail = ''
-loginPassword = ''
+loginEmail = os.getenv('HALLIGAN_U')
+loginPassword = os.getenv('HALLIGAN_PW')
 
 assert (loginEmail != ''), 'login email not set'
 assert (loginPassword != ''), 'login password not set'
 
 r = requests.post('https://www.halliganhelper.com/api/v3/user/login/',
                   data = {'email': loginEmail, 'password': loginPassword}, verify = False)
+
+print(r)
 
 def getInfo (res):
     id = res['data']['id']
@@ -35,8 +43,9 @@ def getInfo (res):
     say (out)
 
 def say (out):
-    engine.say(out)
-    engine.runAndWait()
+    subprocess.run(["espeak", "--stdout", out, "|", "play", "-"])
+   # engine.say(out)
+   # engine.runAndWait()
 
 print("Standing by ...")
 while (True):
